@@ -14,7 +14,6 @@ const [editTarefa, setEditTarefa] = useState(0)
 
 const [showAddAlert,setShowAddAlert] = useState(false);
 
-
 const adicionarNovaTarefa = () => {
   
   if(!novaTarefa){ 
@@ -24,47 +23,47 @@ const adicionarNovaTarefa = () => {
     setNovaTarefa("");
     setShowAddAlert(false)
   }
-  
 }
 
 const editarTarefa = () => {
-
+  
   if(editTarefa){
 
-    const findId = Lista.find((elem) => elem.id === editTarefa);
+    const indx = Lista.find((elem) => elem.id === editTarefa);
     
-    const updateLista = Lista.map((list) => list.id === findId.id // se id no array e id encontrado forem identico 
+    const updateLista = Lista.map((list) => list.id === indx.id // se id no array e id encontrado forem identico 
       ?
-      (list = { id:list.id, nomeTarefa:novaTarefa })//procura no array id encontrado e insere novas tarefas  no array
+      (list = { id:list.id, nomeTarefa:novaTarefa, completed: list.completed })//procura no array id encontrado e insere novas tarefas  no array
       :
-      ({ id:list.id, nomeTarefa:list.nomeTarefa})//se mantem o array igual
- 
+      ({ id:list.id, nomeTarefa:list.nomeTarefa, completed: list.completed })//se mantem o array igual
+
     );
 
-    setLista(updateLista)
+    setLista([...updateLista])
     setNovaTarefa("")
     setEditTarefa(0)
+    setShowAddAlert(false)
     return
   } 
 }
 
 const getTarefa = (id) => {
 
-  const findId = Lista.find((elm) => elm.id === id);
-  setNovaTarefa(findId.nomeTarefa)
+  const indx = Lista.find((elm) => elm.id === id);
+  setNovaTarefa(indx.nomeTarefa)
   setEditTarefa(id)
+  setShowAddAlert(false)
 }
 
-const tarefaCompleted = (id) => {
+const tarefaCompleted = (id, complt) => {
+
+  const indx = Lista.findIndex((elm) => elm.id === id)
+  const novaLista = [...Lista]
+  setShowAddAlert(false)
   
-  const tarefa = Lista.findIndex((elm) => elm.id === id)
+  novaLista[indx].completed = !complt // completed => true
 
-  const novalista = [...Lista]
-
-  novalista[tarefa] = {...novalista[tarefa], completed: true, };
-
-  setLista(novalista);
-
+  setLista([...novaLista])
 }
 
 
@@ -83,14 +82,13 @@ const clearAll = ()=>{
 }
 
   return (
-     <div>
-       <Container>
-       <div className="m-4">
-         <h1 className="titulo ">Lista Tarefas</h1>
+    <div>
+      <Container>
+      <div className="m-4">
+        <h1 className="titulo ">Lista Tarefas</h1>
         </div>
           <Card className="border border-dark bg-dark text-white mt-3 m-4">
             <Card.Body>
-              
                 <InputGroup >
                     <Form.Control
                       type="text"
@@ -143,7 +141,7 @@ const clearAll = ()=>{
                   <div className="div-btnOpc">
                   <Button
                       variant="warning"
-                      onClick={()=>tarefaCompleted(lista.id)}
+                      onClick={()=>tarefaCompleted(lista.id, lista.completed)}
                       className="btn-completed"
                       >
                         <FontAwesomeIcon 
@@ -177,21 +175,21 @@ const clearAll = ()=>{
         <div className=' mt-0 d-grid gap-6 div-btnDelete'>
           {
           Lista.length > 0 ?
-          <Button
-          onClick={()=> clearAll()} 
-          variant="danger"
-          size="lg"
-          className="m-4 "
-          >
-            <h4>Clear</h4>
-          </Button>
+            <Button
+            onClick={()=> clearAll()} 
+            variant="danger"
+            size="lg"
+            className="m-4 "
+            >
+              <h4>Clear</h4>
+            </Button>
             
           :
             <></>
           }     
         </div>  
       </Container>
-     </div>
+    </div>
   
   ); 
 }
